@@ -162,6 +162,16 @@
     const userInput = document.getElementById('user-input');
     const chatMessages = document.getElementById('chat-messages');
 
+    // Gera e armazena um userID único por visitante
+    if (!localStorage.getItem("userID")) {
+      localStorage.setItem("userID", crypto.randomUUID());
+    }
+
+    const userID = localStorage.getItem("userID");
+    const userAgent = navigator.userAgent;
+    const platform = navigator.platform;
+    const language = navigator.language;
+
     function addMessage(text, sender) {
       const message = document.createElement('div');
       message.classList.add('message', sender);
@@ -183,7 +193,6 @@
       }, 1500);
     }
 
-
     chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const text = userInput.value.trim();
@@ -194,10 +203,18 @@
 
       simulateTyping(async () => {
         try {
+          const payload = {
+            message: text,
+            userID: userID,
+            userAgent: userAgent,
+            plataforma: platform,
+            idioma: language
+          };
+
           const response = await fetch('https://jarvis-n8n.bgyjwu.easypanel.host/webhook/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
+            body: JSON.stringify(payload)
           });
 
           const data = await response.json();
